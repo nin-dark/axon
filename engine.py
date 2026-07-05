@@ -25,7 +25,7 @@ from sentence_transformers import SentenceTransformer
 load_dotenv()
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
 logger = logging.getLogger("axon")
@@ -633,9 +633,23 @@ class AxonEngine:
     
     async def translate_intent_to_sql(self, user_prompt: str, user_id: str = "default_user") -> tuple[str, int, int, float]:
 
+        # ── FETCH AVAILABLE TABLES FOR ROUTER ───────────────────────
+        valid_tables = []
+        try:
+            catalog_path = os.path.join(os.environ.get("OMNI_DATA_DIR", "."), "omni_master_catalog.db")
+            async with aiosqlite.connect(catalog_path) as db:
+                cursor = await db.execute("SELECT DISTINCT table_name FROM schema_registry")
+                rows = await cursor.fetchall()
+                valid_tables = [r[0] for r in rows if r[0]]
+        except Exception as e:
+            logger.error(f"Failed to fetch valid tables for router: {e}")
+            
+        tables_str = ", ".join(valid_tables) if valid_tables else "unknown"
+
         router_prompt = (
             f"You are a SQL table extractor. Given a natural language query, "
-            f"return only the table name as a single word. No explanation.\n\nQuery: {user_prompt}"
+            f"select the most relevant table name from this exact list: [{tables_str}].\n"
+            f"Return ONLY the exact table name as a single word. No explanation, no markdown.\n\nQuery: {user_prompt}"
         )
 
         try:
