@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axon Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="header">
+        <h1>Axon</h1>
+        <p class="subtitle">Federated Cognitive Data Intelligence Platform</p>
+    </div>
+
+    <!-- QUERY INPUT -->
+    <div class="query-panel">
+        <input
+            type="text"
+            id="prompt-input"
+            placeholder="Ask anything about your data..."
+            autocomplete="off"
+        />
+        <button id="submit-btn">Execute</button>
+    </div>
+
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+        <span id="progress-text">Ready — enter a query above</span>
+        <span id="cost-display"></span>
+    </div>
+
+    <!-- SQL DISPLAY -->
+    <div id="sql-panel" class="panel hidden">
+        <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Generated SQL</span>
+            <span id="edit-indicator" style="color:var(--text-secondary); font-size:10px; display:none;">✎ EDITABLE MODE</span>
+        </div>
+        <pre id="sql-display" contenteditable="false" spellcheck="false"></pre>
+    </div>
+
+    <!-- DESTRUCTIVE WARNING -->
+    <div id="destructive-warning" class="panel hidden" style="background:var(--error-bg); border-color:var(--error); padding:20px;">
+        <div style="color:var(--error); font-weight:500; font-size:14px; margin-bottom:12px; letter-spacing:0.5px;">⚠️ DESTRUCTIVE COMMAND DETECTED</div>
+        <p style="font-size:13px; color:var(--text-primary); margin-bottom:16px;">This SQL contains a command (DROP, DELETE, etc.) that could modify or destroy data.</p>
+        <div style="display:flex; gap:12px;">
+            <button onclick="forceDestructive()" class="approval-btn" style="background:var(--error); color:#fff; border:none;">Yes, run destructive command</button>
+            <button onclick="cancelDestructive()" class="approval-btn" style="background:var(--bg-input); color:var(--text-primary); border: 1px solid var(--border-color);">Cancel</button>
+        </div>
+    </div>
+
+    <!-- LIVE SOURCE GRID -->
+    <div class="panel">
+        <div class="panel-header">
+            Source Grid — <span id="grid-counter">0 / 0</span> responded
+        </div>
+        <div id="source-grid"></div>
+    </div>
+
+    <!-- INSIGHT REPORT -->
+    <div id="insight-panel" class="panel hidden">
+        <div class="panel-header">Intelligence Report</div>
+        <p id="insight-text"></p>
+        <div id="ml-stats"></div>
+        <button id="toggle-raw-data-btn" onclick="toggleRawData()" class="approval-btn" style="margin-top: 24px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); width: 100%;">
+            📊 Show Raw JSON Data
+        </button>
+    </div>
+
+    <!-- RAW DATA DISPLAY -->
+    <div id="raw-data-panel" class="panel hidden">
+        <div class="panel-header">Raw Query Data (JSON)</div>
+        <pre id="raw-data-display" style="padding:24px;font-family:'Fira Code', monospace;font-size:13px;color:#a5d6ff;background:rgba(10,10,15,0.4);max-height:500px;overflow:auto;white-space:pre-wrap;"></pre>
+    </div>
+
+    <!-- METRICS PANEL -->
+    <div class="panel">
+        <div class="panel-header">System Metrics</div>
+        <div id="metrics-display" class="metrics-grid"></div>
+    </div>
+
+    <!-- VAULT PANEL -->
+    <div class="panel">
+        <div class="panel-header">MemPalace Cache</div>
+        <table id="vault-table">
+            <thead>
+                <tr>
+                    <th>Intent</th>
+                    <th>Cached SQL</th>
+                    <th>Hits</th>
+                    <th>Last Used</th>
+                </tr>
+            </thead>
+            <tbody id="vault-body"></tbody>
+        </table>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

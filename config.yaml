@@ -1,0 +1,50 @@
+llm:
+  model: gemini-2.5-flash-lite
+  input_cost_per_million_tokens: 0.1
+  output_cost_per_million_tokens: 0.4
+  ai_latency_threshold_ms: 3000
+  router_model: gemini-2.5-flash
+  sql_model: gemini-2.5-pro
+cache:
+  embedding_model: all-MiniLM-L6-v2
+  embedding_dim: 384
+  semantic_similarity_threshold: 0.7
+  tfidf_threshold: 0.4
+engine:
+  max_concurrent_connections: 50
+  max_prompt_length: 500
+  approval_timeout_seconds: 300
+  sql_injection_signals:
+  - DROP TABLE
+  - DELETE FROM
+  - --
+  - /*
+  - '*/'
+  - UNION SELECT
+  max_rows_per_query: 5000
+monitoring:
+  drift_window_size: 100
+  health_check_interval_hours: 1
+  alert_webhook_url: ''
+  health_check_queries:
+  - SELECT COUNT(*) FROM transactions WHERE status = 'Failed'
+  - SELECT AVG(amount) FROM transactions
+api:
+  host: 0.0.0.0
+  port: 8000
+  cors_origins:
+  - '*'
+data_sources:
+- path: ./mock_databases
+privacy:
+  disable_sample_values: true
+  masked_columns:
+  - credit_card
+  - ssn
+  - password
+  - email
+  - phone
+  user_contexts:
+    user_sales_ny: The user is in the NY office. Only generate SQL for NY data (region='NY').
+    user_hr: The user is HR. They can see all regions but DO NOT show compensation
+      data.

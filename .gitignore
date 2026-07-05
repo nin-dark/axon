@@ -1,0 +1,26 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# SQLite databases (generated at runtime)
+*.db
+*.db-journal
+
+# Runtime artifacts
+baseline_snapshot.json
+drift_report_*.html
+
+# Dev-only files (not for GitHub)
+proto.ipynb
+refactor_*.py
+context/
+Dockerfile
+.dockerignore
+
+# Mock data (regenerated on boot)
+mock_databases/
